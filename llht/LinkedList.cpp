@@ -1,0 +1,107 @@
+#include <cstdlib>
+
+#include "LinkedList.hpp"
+#include "LinkedList_priv.hpp"
+
+///////////////////////////////////////////////////////////////////////////////
+// LinkedList implementation.
+
+LinkedList* LinkedList_New() {
+  // TODO: allocate the LinkedList struct and initialize the newly allocated
+  // record structure.
+
+  return nullptr;  // you may want to change this
+}
+
+void LinkedList_Delete(LinkedList* list,
+                       LLPayloadFreeFnPtr payload_free_function) {
+  // TODO: sweep through the list and deallocate all of the nodes' payloads
+  // (using the payload_free_function supplied as an argument) and
+  // the nodes themselves.
+
+  // delete the LinkedList
+  delete list;
+}
+
+size_t LinkedList_NumElements(LinkedList* list) {
+  return list->num_elements;
+}
+
+void LinkedList_Push(LinkedList* list, LLPayload_t payload) {
+  // TODO: implement LinkedList_Push
+}
+
+bool LinkedList_Pop(LinkedList* list, LLPayload_t* payload_ptr) {
+  // TODO: implement LinkedList_Pop.  Make sure you test for
+  // and empty list and fail.  If the list is non-empty, there
+  // are two cases to consider: (a) a list with a single element in it
+  // and (b) the general case of a list with >=2 elements in it.
+  // Be sure to call delete to deallocate the memory that was
+  // previously allocated by LinkedList_Push().
+
+  return true;  // you may need to change this return value
+}
+
+void LinkedList_Append(LinkedList* list, LLPayload_t payload) {
+  // TODO: implement LinkedList_Append.  It's kind of like
+  // LinkedList_Push, but obviously you need to add to the end
+  // instead of the beginning.
+}
+
+bool LinkedList_Slice(LinkedList* list, LLPayload_t* payload_ptr) {
+  // TODO: implement LinkedList_Slice.
+
+  return true;  // you may need to change this return value
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// LLIterator implementation.
+
+LLIterator* LLIterator_New(LinkedList* list) {
+  // TODO: implement
+  return nullptr;  // you may want to change this
+}
+
+// implemented for you
+void LLIterator_Delete(LLIterator* iter) {
+  delete iter;
+}
+
+bool LLIterator_IsValid(LLIterator* iter) {
+  // TODO: implement
+  return false;  // you may want to change this
+}
+
+bool LLIterator_Next(LLIterator* iter) {
+  // TODO: try to advance iterator to the next node and return true if
+  // you succeed and are now on a new node, false otherwise
+
+  return true;  // you may need to change this return value
+}
+
+void LLIterator_Get(LLIterator* iter, LLPayload_t* payload) {
+  // TODO: implement
+}
+
+bool LLIterator_Remove(LLIterator* iter,
+                       LLPayloadFreeFnPtr payload_free_function) {
+  // TODO: implement LLIterator_Remove.  This is the most
+  // complex function you'll build.  There are several cases
+  // to consider:
+  // - degenerate case: the list becomes empty after deleting.
+  // - degenerate case: iter points at head
+  // - degenerate case: iter points at tail
+  // - fully general case: iter points in the middle of a list,
+  //                       and you have to "splice".
+  //
+  // Be sure to call the payload_free_function to deallocate the payload
+  // the iterator is pointing to, and also deallocate any LinkedList
+  // data structure element as appropriate.
+
+  return true;  // you may need to change this return value
+}
+
+// Implemented for you
+void LLIterator_Rewind(LLIterator* iter) {
+  iter->node = iter->list->head;
+}
