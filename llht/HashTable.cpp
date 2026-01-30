@@ -218,14 +218,29 @@ bool HTIterator_IsValid(HTIterator* iter) {
 
 bool HTIterator_Next(HTIterator* iter) {
   // STEP 5: implement HTIterator_Next.
-
+  if (iter->bucket_it == nullptr) {
+    return false;
+  }
+  if (LLIterator_Next(iter->bucket_it)) {
+    return true;
+  }
+  iter->bucket_idx++;
+  if (iter->bucket_idx >= iter->ht->num_buckets) {
+    return false;
+  }
+  iter->bucket_it = LLIterator_New(iter->ht->buckets[iter->bucket_idx]);
   return true;  // you may need to change this return value
 }
 
 bool HTIterator_Get(HTIterator* iter, HTKeyValue_t* keyvalue) {
   // STEP 6: implement HTIterator_Get.
-
-  return true;  // you may need to change this return value
+  if (iter->bucket_it == nullptr) {
+    return false;
+  }
+  LLPayload_t payload;
+  LLIterator_Get(iter->bucket_it, &payload);
+  *keyvalue = *reinterpret_cast<HTKeyValue_t*>(payload);
+  return true;
 }
 
 // Implemented for you
