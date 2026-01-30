@@ -1,4 +1,4 @@
-#ifndef HASHTABLE_HPP_
+'#ifndef HASHTABLE_HPP_
 #define HASHTABLE_HPP_
 
 #include <cstdint>  // for uint64_t, etc.

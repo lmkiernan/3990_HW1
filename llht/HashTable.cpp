@@ -115,8 +115,22 @@ bool HashTable_Insert(HashTable* table,
   // and optionally remove a key within a chain, rather than putting
   // all that logic inside here.  You might also find that your helper
   // can be reused in steps 2 and 3.
-
-  return false;  // you may need to change this return value
+  HTKeyValue_t* kv = new HTKeyValue_t();
+  kv->hash = newkeyvalue.hash;
+  kv->key = newkeyvalue.key;
+  kv->value = newkeyvalue.value;
+  LinkedListNode* node = chain->head;
+  while (node != nullptr) {
+    if (table->key_cmp_fn(node->payload->key, newkeyvalue.key)) {
+      *oldkeyvalue = *reinterpret_cast<HTKeyValue_t*>(node->payload);
+      node->payload = reinterpret_cast<LLPayload_t>(kv);
+      return true;
+    }
+    node = node->next;
+  }
+  LinkedList_Push(chain, kv);
+  table->num_elements++;
+  return false;
 }
 
 bool HashTable_Find(HashTable* table,
@@ -124,7 +138,16 @@ bool HashTable_Find(HashTable* table,
                     HTKey_t key,
                     HTKeyValue_t* keyvalue) {
   // STEP 2: implement HashTable_Find.
-
+  const size_t bucket = HashKeyToBucketNum(table, newkeyvalue.hash);
+  LinkedList* chain = table->buckets[bucket];
+  LinkedListNode* node = chain->head;
+  while (node != nullptr) {
+    if (table->key_cmp_fn(node->payload->key, key)) {
+      *keyvalue = *reinterpret_cast<HTKeyValue_t*>(node->payload);
+      return true;
+    }
+    node = node->next;
+  }
   return false;  // you may need to change this return value
 }
 
@@ -133,7 +156,18 @@ bool HashTable_Remove(HashTable* table,
                       HTKey_t key,
                       HTKeyValue_t* keyvalue) {
   // STEP 3: implement HashTable_Remove.
-
+  const size_t bucket = HashKeyToBucketNum(table, hash);
+  LinkedList* chain = table->buckets[bucket];
+  LinkedListNode* node = chain->head;
+  while (node != nullptr) {
+    if (table->key_cmp_fn(node->payload->key, key)) {
+      *keyvalue = *reinterpret_cast<HTKeyValue_t*>(node->payload);
+      LinkedList_Remove(chain, node->payload);
+      table->num_elements--;
+      return true;
+    }
+    node = node->next;
+  }
   return false;  // you may need to change this return value
 }
 
@@ -178,7 +212,7 @@ void HTIterator_Delete(HTIterator* iter) {
 
 bool HTIterator_IsValid(HTIterator* iter) {
   // STEP 4: implement HTIterator_IsValid.
-
+  return iter->bucket_it != nullptr;
   return true;  // you may need to change this return value
 }
 
