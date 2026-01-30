@@ -9,8 +9,11 @@
 LinkedList* LinkedList_New() {
   // TODO: allocate the LinkedList struct and initialize the newly allocated
   // record structure.
-
-  return nullptr;  // you may want to change this
+  LinkedList* list = new LinkedList();
+  list->num_elements = 0;
+  list->head = nullptr;
+  list->tail = nullptr;
+  return list;  // you may want to change this
 }
 
 void LinkedList_Delete(LinkedList* list,
@@ -18,8 +21,15 @@ void LinkedList_Delete(LinkedList* list,
   // TODO: sweep through the list and deallocate all of the nodes' payloads
   // (using the payload_free_function supplied as an argument) and
   // the nodes themselves.
-
   // delete the LinkedList
+  while (list->head != nullptr) {
+    LinkedListNode* node = list->head;
+    list->head = node->next;
+    payload_free_function(node->payload);
+    delete node;
+  }
+  list->tail = nullptr;
+  list->num_elements = 0;
   delete list;
 }
 
@@ -29,6 +39,18 @@ size_t LinkedList_NumElements(LinkedList* list) {
 
 void LinkedList_Push(LinkedList* list, LLPayload_t payload) {
   // TODO: implement LinkedList_Push
+  LinkedListNode* node = new LinkedListNode();
+  node->payload = payload;
+  node->next = list->head;
+  node->prev = nullptr;
+  if (list->head != nullptr) {
+    list->head->prev = node;
+  }
+  list->head = node;
+  if (list->tail == nullptr) {
+    list->tail = node;
+  }
+  list->num_elements++;
 }
 
 bool LinkedList_Pop(LinkedList* list, LLPayload_t* payload_ptr) {
@@ -38,7 +60,18 @@ bool LinkedList_Pop(LinkedList* list, LLPayload_t* payload_ptr) {
   // and (b) the general case of a list with >=2 elements in it.
   // Be sure to call delete to deallocate the memory that was
   // previously allocated by LinkedList_Push().
+  if (list->num_elements == 0) {
+    return false;
+  }
 
+  LinkedListNode* node = list->head;
+  *payload_ptr = node->payload;
+  list->head = node->next;
+  if (list->head != nullptr) {
+    list->head->prev = nullptr;
+  }
+  delete node;
+  list->num_elements--;
   return true;  // you may need to change this return value
 }
 
@@ -46,11 +79,33 @@ void LinkedList_Append(LinkedList* list, LLPayload_t payload) {
   // TODO: implement LinkedList_Append.  It's kind of like
   // LinkedList_Push, but obviously you need to add to the end
   // instead of the beginning.
+  LinkedListNode* node = new LinkedListNode();
+  node->payload = payload;
+  node->next = nullptr;
+  node->prev = list->tail;
+  if (list->tail != nullptr) {
+    list->tail->next = node;
+  }
+  list->tail = node;
+  if (list->head == nullptr) {
+    list->head = node;
+  }
+  list->num_elements++;
 }
 
 bool LinkedList_Slice(LinkedList* list, LLPayload_t* payload_ptr) {
   // TODO: implement LinkedList_Slice.
-
+  if (list->num_elements == 0) {
+    return false;
+  }
+  LinkedListNode* node = list->tail;
+  *payload_ptr = node->payload;
+  list->tail = node->prev;
+  if (list->tail != nullptr) {
+    list->tail->next = nullptr;
+  }
+  delete node;
+  list->num_elements--;
   return true;  // you may need to change this return value
 }
 
