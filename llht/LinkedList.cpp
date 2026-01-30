@@ -113,8 +113,10 @@ bool LinkedList_Slice(LinkedList* list, LLPayload_t* payload_ptr) {
 // LLIterator implementation.
 
 LLIterator* LLIterator_New(LinkedList* list) {
-  // TODO: implement
-  return nullptr;  // you may want to change this
+  LLIterator* iter = new LLIterator();
+  iter->list = list;
+  iter->node = list->head;
+  return iter; 
 }
 
 // implemented for you
@@ -124,18 +126,24 @@ void LLIterator_Delete(LLIterator* iter) {
 
 bool LLIterator_IsValid(LLIterator* iter) {
   // TODO: implement
-  return false;  // you may want to change this
+  return iter->node != nullptr;
 }
 
 bool LLIterator_Next(LLIterator* iter) {
   // TODO: try to advance iterator to the next node and return true if
   // you succeed and are now on a new node, false otherwise
-
-  return true;  // you may need to change this return value
+  if (iter->node == nullptr) {
+    return false;
+  }
+  iter->node = iter->node->next;
+  return true;
 }
 
 void LLIterator_Get(LLIterator* iter, LLPayload_t* payload) {
-  // TODO: implement
+  if (iter->node == nullptr) {
+    return;
+  }
+  *payload = iter->node->payload;
 }
 
 bool LLIterator_Remove(LLIterator* iter,
@@ -152,8 +160,40 @@ bool LLIterator_Remove(LLIterator* iter,
   // Be sure to call the payload_free_function to deallocate the payload
   // the iterator is pointing to, and also deallocate any LinkedList
   // data structure element as appropriate.
-
-  return true;  // you may need to change this return value
+  if (iter->list->num_elements <= 1) {
+    payload_free_function(iter->node->payload);
+    delete iter->node;
+    iter->list->head = nullptr;
+    iter->list->tail = nullptr;
+    iter->list->num_elements = 0;
+    delete iter;
+    return false;
+  }
+  if (iter->node.prev == nullptr) {
+    iter->list->head = iter->node->next;
+    iter->list->head->prev = nullptr;
+    iter->list->num_elements--;
+    payload_free_function(iter->node->payload);
+    delete iter->node;
+    iter->node = iter->list->head;
+    return true;
+  }
+  if (iter->node->next == nullptr) {
+    iter->list->tail = iter->node->prev;
+    iter->list->tail->next = nullptr;
+    iter->list->num_elements--;
+    payload_free_function(iter->node->payload);
+    delete iter->node;
+    iter->node = iter->list->tail;
+    return true;
+  }
+  iter->node->prev->next = iter->node->next;
+  iter->node->next->prev = iter->node->prev;
+  iter->list->num_elements--;
+  payload_free_function(iter->node->payload);
+  delete iter->node;
+  iter->node = iter->node->next;
+  return true;
 }
 
 // Implemented for you
